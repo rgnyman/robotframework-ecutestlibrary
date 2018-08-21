@@ -9,6 +9,7 @@ TODO Add documentation
 from ApiClient import ApiClient as ApiClientClass
 import ApiClient as ApiClientModule
 from logging import debug, error, info, warn
+import types
 import inspect
 
 class EcuApiClient:
@@ -44,8 +45,12 @@ class EcuApiClient:
         
     def initialize_method_mapping(self):
         self.keywordMapping = self.get_all_api_methods()
-        members = self.get_method_names(self.api.ConfigurationApi)
-        self.add_api_objects('ConfigurationApi', members)
+        self.add_main_api_classes(self.api.ConfigurationApi)
+        self.add_main_api_classes(self.api.PackageApi)
+        
+    def add_main_api_classes(self, api_class):
+        members = self.get_method_names(api_class)
+        self.add_api_objects(api_class.__class__.__name__, members)
 
     def add_api_objects(self, class_name, members):
         for mn in members:
@@ -55,14 +60,20 @@ class EcuApiClient:
             self.keywordMapping[name] = mn[1]
 
     def get_method_names(self, classObject):
-        return inspect.getmembers(classObject, inspect.ismethod)
+        methods = inspect.getmembers(classObject)
+        debug(classObject)
+        debug(methods)
+        return methods
 
     def run_keyword(self, name, args, kwargs):
-        debug(name, args, kwargs)
         method = self.keywordMapping[name]
+        debug(name)
         debug(method)
         if len(args) == 0:
-            ret = method()
+            if callable(method):
+                ret = method()
+            else:
+                ret = method
         else:
             ret = method(args[0])
         object_methods = self.get_method_names(ret)
