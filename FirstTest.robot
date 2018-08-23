@@ -5,8 +5,8 @@ Library		EcuApiClient
 Ecu Client Tutorial
 	Create New Pakage
 	Create Test Step Api
-	Create Test Step Calculation
-	Add Step Expectation 	3+4		7
+	Add Calculation Step With Expectation 	3+4		7
+	Save Package 	c:\\Users\\User\\Documents\\ecu\\Test Package
 	
 *** Keywords ***
 Create New Pakage
@@ -17,13 +17,21 @@ Create Test Step Api
 	PackageApi.TestStepApi
 
 Create Test Step Calculation
-	TestStepApi.CreateTsCalculation
+	${ts_calculation}=	TestStepApi.CreateTsCalculation
+	[return]	${ts_calculation}
 
-Add Step Expectation
+Add Calculation Step With Expectation
 	[Arguments]		${expression}		${expected}
+	${calculation_step}=	Create Test Step Calculation
 	${numeric_expetation}=	ExpectationApi.CreateNumericExpectation
 	NumericExpectation.SetExpression	${expression}
-	TSCalculation.SetExpectation	${numeric_expetation}
+	TsCalculation.SetExpectation	${numeric_expetation}
+	TsCalculation.SetFormula		"7"	
+	Package.AppendTestStep			${calculation_step}
+
+Save Package
+	[Arguments]			${package-file}
+	Package.Save		${package-file}
 
 CreateAndStoreTestConfiguration
 	LOG		Calling
