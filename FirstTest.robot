@@ -1,12 +1,19 @@
 *** Settings ***
 Library		EcuApiClient
+Library		EcuComApi
+
+
+*** Variables ***
+${TutorialCalculationPackage}		c:\\Users\\User\\Documents\\ecu\\Test Package.pkg
 
 *** Test Cases ***
-Ecu Client Tutorial
+Ecu Client Tutorial Calculation Test Step
 	Create New Pakage
 	Create Test Step Api
 	Add Calculation Step With Expectation 	3+4		7
-	Save Package 	c:\\Users\\User\\Documents\\ecu\\Test Package
+	Save Package 		${TutorialCalculationPackage}
+	Run Test Package   	${TutorialCalculationPackage}
+	[Teardown]		Close Test Package  	${TutorialCalculationPackage}
 	
 *** Keywords ***
 Create New Pakage
@@ -22,11 +29,11 @@ Create Test Step Calculation
 
 Add Calculation Step With Expectation
 	[Arguments]		${expression}		${expected}
-	${calculation_step}=	Create Test Step Calculation
 	${numeric_expetation}=	ExpectationApi.CreateNumericExpectation
 	NumericExpectation.SetExpression	${expression}
+	${calculation_step}=			Create Test Step Calculation
 	TsCalculation.SetExpectation	${numeric_expetation}
-	TsCalculation.SetFormula		"7"	
+	TsCalculation.SetFormula		${expected}
 	Package.AppendTestStep			${calculation_step}
 
 Save Package
