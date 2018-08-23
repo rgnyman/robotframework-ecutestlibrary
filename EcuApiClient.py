@@ -60,8 +60,8 @@ class EcuApiClient:
             self.keywordMapping[name] = mn[1]
 
     def get_method_names(self, classObject):
-        methods = inspect.getmembers(classObject)
         debug(classObject)
+        methods = inspect.getmembers(classObject)
         debug(methods)
         return methods
 
@@ -76,6 +76,7 @@ class EcuApiClient:
                 ret = method
         else:
             ret = method(args[0])
+        """if not ret in args:""" 
         object_methods = self.get_method_names(ret)
         self.update_method_dictionary(object_methods, ret.__class__.__name__)
         return ret
