@@ -16,9 +16,12 @@ class EcuApiClient:
 
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
     
-    def get_all_api_classes(self):
-        return inspect.getmembers(ApiClientModule, inspect.isclass)
-
+    
+    def initialize_method_mapping(self):
+        self.keywordMapping = self.get_all_api_methods()
+        self.add_main_api_class(self.api.ConfigurationApi)
+        self.add_main_api_class(self.api.PackageApi)
+    
     def get_all_api_methods(self):
         classes = self.get_all_api_classes()
         for c in classes:
@@ -26,6 +29,9 @@ class EcuApiClient:
             class_methods = self.remove_not_needed_methods(class_methods)
             self.update_keyword_dictionary(c[0], class_methods, c[1])
         return self.keywordMapping
+
+    def get_all_api_classes(self):
+        return inspect.getmembers(ApiClientModule, inspect.isclass)
 
     def update_keyword_dictionary(self, class_name, methods, object_id):
         for mn in methods:
@@ -42,22 +48,10 @@ class EcuApiClient:
 
     def remove_undescore_names(self, methods):
         return [elem for elem in methods if elem[0] != '_']
-        
-    def initialize_method_mapping(self):
-        self.keywordMapping = self.get_all_api_methods()
-        self.add_main_api_class(self.api.ConfigurationApi)
-        self.add_main_api_class(self.api.PackageApi)
-        
+            
     def add_main_api_class(self, api_class):
         members = self.get_method_names(api_class)
-        self.add_api_objects(api_class.__class__.__name__, members)
-
-    def add_api_objects(self, class_name, members):
-        for mn in members:
-            name = class_name + "." + mn[0]
-            debug(name)
-            debug(mn[1])
-            self.keywordMapping[name] = mn[1]
+        self.add_new_keywords(members, api_class.__class__.__name__)
 
     def get_method_names(self, classObject):
         debug(classObject)
@@ -92,15 +86,6 @@ class EcuApiClient:
         else:
             return method(*args, **kwargs)
 
-    def get_keyword_documentation(self, name):
-        pass
-
-    def get_keyword_tags(self, name):
-        pass
-
-    def get_keyword_arguments(self, name):
-        pass
-
     def update_method_dictionary(self, members, object_name):
         if object_name == 'NoneType':
             return
@@ -117,6 +102,15 @@ class EcuApiClient:
             name = object_name + '.' + m[0]
             debug("Adding keyword with name '%s' for method '%s'", name, m[1])
             self.keywordMapping[name] = m[1]
+
+    def get_keyword_documentation(self, name):
+        pass
+
+    def get_keyword_tags(self, name):
+        pass
+
+    def get_keyword_arguments(self, name):
+        pass
 
     def get_mappings(self):
         return self.keywordMapping
