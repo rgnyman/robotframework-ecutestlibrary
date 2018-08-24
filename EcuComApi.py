@@ -21,11 +21,15 @@ class EcuComApi:
             raise AssertionError("Package '%s' not found" % (packageName))
 
         execInfo = self.etEnv.ExecutePackage(packageName)
-        execInfo.WaitForTestexecutionCompletion(timeOutSeonds)
+        runResult = execInfo.WaitForTestexecutionCompletion(timeOutSeonds)
+        if not "FINISHED" == runResult:
+            raise RuntimeError("Test execution timed out. Result'%s'" % (runResult))
+
         status = execInfo.GetPackageResult()
         if not "SUCCESS" == status:
             raise RuntimeError("Test execution failed with result '%s'" % (status))
 
+        info("ECU test run compelted with result '%s'", status)
         return status
 
     def close_test_package(self, packageName):
