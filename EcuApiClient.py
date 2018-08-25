@@ -35,7 +35,7 @@ class EcuApiClient:
 
     def update_keyword_dictionary(self, class_name, methods, object_id):
         for mn in methods:
-            mn = class_name + "." + mn
+            mn = class_name + '_' + mn
             self.keywordMapping[mn] = object_id
 
     def remove_not_needed_methods(self, methods):
@@ -99,7 +99,7 @@ class EcuApiClient:
 
     def add_new_keywords(self, members, object_name):
         for m in members:
-            name = object_name + '.' + m[0]
+            name = object_name + '_' + m[0]
             debug("Adding keyword with name '%s' for method '%s'", name, m[1])
             self.keywordMapping[name] = m[1]
 
