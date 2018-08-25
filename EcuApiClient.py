@@ -16,7 +16,6 @@ class EcuApiClient:
 
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
     
-    
     def initialize_method_mapping(self):
         self.keywordMapping = self.get_all_api_methods()
         self.add_main_api_class(self.api.ConfigurationApi)
@@ -66,6 +65,9 @@ class EcuApiClient:
         debug("call_result '%s'", call_result)
         object_methods = self.get_method_names(call_result)
         self.update_method_dictionary(object_methods, call_result.__class__.__name__)
+        docs = inspect.getdoc(method)
+        if len(docs) > 5:
+            info(docs)
         return call_result
 
     def call_method(self, method, args, kwargs):
@@ -104,7 +106,9 @@ class EcuApiClient:
             self.keywordMapping[name] = m[1]
 
     def get_keyword_documentation(self, name):
-        pass
+        obj = self.keywordMapping[name]
+        docs = inspect.getdoc(obj)
+        return docs
 
     def get_keyword_tags(self, name):
         pass
@@ -117,16 +121,8 @@ class EcuApiClient:
 
     def get_keyword_names(self):
         self.initialize_method_mapping()
-        self.keywordMapping['store_methods'] = self.store_methods
         debug(self.keywordMapping.keys())
         return self.keywordMapping.keys()
-
-    def store_methods(self, classObject):
-        info("Looking for object", classObject)
-        members = self.get_method_names(classObject)
-        info(members)
-        self.update_method_dictionary(members)
-
 
     def __init__(self):
         self.api = ApiClientClass()

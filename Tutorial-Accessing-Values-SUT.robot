@@ -19,15 +19,14 @@ Ecu Client Tutorial Calculation Test Step
 	Create New Package
 	Create Model Mapping   		Plant Model 	simState 	VALUE
 	Add Test Step Write			5	Plant Model/simState
+	Save Package 				${TUTORIAL_ACCESING_SUT_PKG}
+	Run Test Package  			${TUTORIAL_ACCESING_SUT_PKG}
 
 *** Keywords ***
 Create New Package
 	PackageApi CreatePackage
 	PackageApi ExpectationApi
 	PackageApi MappingApi
-	PackageApi TestStepApi
-
-Create Test Step Api
 	PackageApi TestStepApi
 
 Create Model Mapping

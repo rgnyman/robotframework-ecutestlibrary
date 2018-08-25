@@ -28,10 +28,21 @@ class EcuComApi:
 
         status = execInfo.GetPackageResult()
         if not "SUCCESS" == status:
-            raise RuntimeError("Test execution failed with result '%s'" % (status))
+            reportStr = self.create_report_string(execInfo.GetTestReport(), execInfo.GetLogFolder())
+            raise RuntimeError("Test execution failed with result '%s' \n\n%s" % (status, reportStr))
 
         info("ECU test run compelted with result '%s'", status)
         return status
+
+    def create_report_string(self, testReport, testReportFolder):
+        tr = "Full test report is at location "
+        tr += testReportFolder + "\n"
+        for i in range(0, testReport.GetCount()):
+            tr += "Activity/Name: " + testReport.Activity(i) + " / " + testReport.Name(i) + "\n"
+            tr += "Result: " + testReport.Result(i) + "\n"
+            tr += "Comment: " + testReport.Comment(i) + "\n"
+            tr += "-----------------------------------------------------------------------------\n"
+        return tr
 
     def open_test_configuration(self, testConfigurationName):
         debug("Opening test configuration '%s'", testConfigurationName)
