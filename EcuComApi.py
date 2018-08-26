@@ -8,7 +8,7 @@ TODO Add License
 """
 
 import win32com.client
-from logging import debug, error, info, warn
+from logging import debug, error, info, warn, log
 
 class EcuComApi:
 
@@ -27,22 +27,23 @@ class EcuComApi:
             raise RuntimeError("Test execution timed out. Result'%s'" % (runResult))
 
         status = execInfo.GetPackageResult()
+        reportStr = self.create_report_string(execInfo.GetTestReport(), execInfo.GetLogFolder())
         if not "SUCCESS" == status:
-            reportStr = self.create_report_string(execInfo.GetTestReport(), execInfo.GetLogFolder())
-            raise RuntimeError("Test execution failed with result '%s' \n\n%s" % (status, reportStr))
+            raise RuntimeError("Test execution failed with result '%s'" % (status))
 
-        info("ECU test run compelted with result '%s'", status)
+        info("ECU test run compelted with result '%s'\n", status)
         return status
 
     def create_report_string(self, testReport, testReportFolder):
-        tr = "Full test report is at location "
-        tr += testReportFolder + "\n"
+        info("Full test report is at location\n" + testReportFolder)
+        """html_str = "<a href=" + testReportFolder + ">Test Report</a>"
+        info(html_str, True)"""
         for i in range(0, testReport.GetCount()):
-            tr += "Activity/Name: " + testReport.Activity(i) + " / " + testReport.Name(i) + "\n"
+            tr = "Activity/Name: " + testReport.Activity(i) + " / " + testReport.Name(i) + "\n"
             tr += "Result: " + testReport.Result(i) + "\n"
             tr += "Comment: " + testReport.Comment(i) + "\n"
             tr += "-----------------------------------------------------------------------------\n"
-        return tr
+            info(tr)
 
     def open_test_configuration(self, testConfigurationName):
         debug("Opening test configuration '%s'", testConfigurationName)
