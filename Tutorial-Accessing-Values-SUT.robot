@@ -33,3 +33,4 @@ Ecu Client Tutorial Calculation Test Step
 Clean After Test
 	Stop Test Environment
 	Save Package 	${TUTORIAL_ACCESING_SUT_PKG}
+	Close Test Package	${TUTORIAL_ACCESING_SUT_PKG}
