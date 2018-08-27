@@ -9,6 +9,7 @@ TODO Add License
 from ApiClient import ApiClient as ApiClientClass
 import ApiClient as ApiClientModule
 from logging import debug, error, info, warn
+from EcuComApi import EcuComApi
 import types
 import inspect
 
@@ -17,6 +18,8 @@ class EcuApiClient:
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
     
     def initialize_method_mapping(self):
+        if None == self.ecuComApi:
+            self.ecuComApi = EcuApiClient()
         self.keywordMapping = self.get_all_api_methods()
         self.add_main_api_class(self.api.ConfigurationApi)
         self.add_main_api_class(self.api.PackageApi)
@@ -125,6 +128,8 @@ class EcuApiClient:
         return self.keywordMapping.keys()
 
     def __init__(self):
+        self.ecuComApi = EcuComApi()
+        self.ecuComApi.start_test_environment()
         self.api = ApiClientClass()
         self.keywordMapping = dict()
         self.initialize_method_mapping()

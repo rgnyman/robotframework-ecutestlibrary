@@ -31,7 +31,7 @@ class EcuComApi:
         if not "SUCCESS" == status:
             raise RuntimeError("Test execution failed with result '%s'" % (status))
 
-        info("ECU test run compelted with result '%s'\n", status)
+        info("ECU test run completed with result '%s'\n", status)
         return status
 
     def create_report_string(self, testReport, testReportFolder):

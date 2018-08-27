@@ -2,6 +2,7 @@
 Library			EcuApiClient
 Library			EcuComApi
 Resource		Ecu Keywords.robot
+Suite Setup		Start Test Environment
 Test TearDown	Clean After Test
 
 
