@@ -48,7 +48,13 @@ class EcuComApi:
     def open_test_configuration(self, testConfigurationName):
         debug("Opening test configuration '%s'", testConfigurationName)
         if not True == self.etApp.OpenTestConfiguration(testConfigurationName):
-            raise RuntimeError("Can not opent test configuration '%s'", testConfigurationName)
+            raise RuntimeError("Can not open test configuration '%s'", testConfigurationName)
+
+
+    def open_test_bench_configuration(self, testBenchConfigurationName):
+        debug("Opening test configuration '%s'", testBenchConfigurationName)
+        if not True == self.etApp.OpenTestBenchConfiguration(testBenchConfigurationName):
+            raise RuntimeError("Can not open test bench configuration '%s'", testBenchConfigurationName)
 
     def start_test_environment(self):
         self.etEnv = self.etApp.Start()
