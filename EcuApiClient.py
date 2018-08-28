@@ -105,7 +105,6 @@ class EcuApiClient:
         return call_result
 
     def get_method(self, name):
-        debug("calling method '%s' found with name '%s' args '%s' kwargs '%s'", method, name, args, kwargs)
         return self.keywordMapping[name]
 
     def after_run_update_new_objects_keywords(self, call_result):
