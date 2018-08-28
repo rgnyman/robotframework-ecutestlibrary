@@ -61,14 +61,19 @@ class EcuApiClient:
 
     def update_keyword_dictionary(self, class_name, methods, object_id):
         for mn in methods:
-            mn = class_name + '_' + mn
-            self.keywordMapping[mn] = object_id
+            self.add_name_object_keywords(class_name, mn, object_id)
+        
+    def add_name_object_keywords(self, class_name, method_name, object_id):
+        key = class_name + '_' + method_name
+        debug("Adding keyword with name '%s' for method '%s'", key, object_id)
+        self.keywordMapping[key] = object_id
 
-    def add_new_keywords(self, members, object_name):
+    def add_new_keywords(self, members, class_name):
         for m in members:
-            name = object_name + '_' + m[0]
+            self.add_name_object_keywords(class_name, m[0], m[1])
+            """name = object_name + '_' + m[0]
             debug("Adding keyword with name '%s' for method '%s'", name, m[1])
-            self.keywordMapping[name] = m[1]
+            self.keywordMapping[name] = m[1]"""
 
     def remove_not_needed_methods(self, methods):
         methods = self.remove_undescore_names(methods)
