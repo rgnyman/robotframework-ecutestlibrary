@@ -30,7 +30,7 @@ class EcuApiClient:
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
     
     def initialize_method_mapping(self):
-        self.keywordMapping = self.get_all_api_methods()
+        self.get_all_api_methods()
         self.create_api_classes()
 
     def create_api_classes(self):
@@ -108,6 +108,8 @@ class EcuApiClient:
         return self.keywordMapping[name]
 
     def after_run_update_new_objects_keywords(self, call_result):
+        if call_result.__class__.__name__ == 'NoneType':
+            return
         object_methods = self.get_method_names(call_result)
         self.update_method_dictionary(object_methods, call_result.__class__.__name__)
         
@@ -135,8 +137,6 @@ class EcuApiClient:
             return method(*args, **kwargs)
 
     def update_method_dictionary(self, members, object_name):
-        if object_name == 'NoneType':
-            return
         members = self.clean_methods(members)
         self.add_new_keywords(members, object_name)
     
