@@ -1,16 +1,28 @@
 """ Proxy library to access ECU-TEST Api from Robot Framework 
 
-TODO Add documentation
+Library collects all keywords names from ApiClient module using dir(). These methods are stored to dictionary 
+so that in Format [ClassName_Method][method]. Since most of the objects can not be created at initialization phase only
+main Api objects are created in initialization phase. Rest of the method in dictionary are replaced with real callable methods
+when the class containing the methods is created using the main Api methods. 
 
-Copyright 2018 Rannicon Oy All Rights Reserved 
+Copyright 2018 Ran Nyman, Rannicon Oy and Gosei Oy
 
-TODO Add License
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 from ApiClient import ApiClient as ApiClientClass
 import ApiClient as ApiClientModule
 from logging import debug, error, info, warn
 from EcuComApi import EcuComApi
-import types
 import inspect
 
 class EcuApiClient:
@@ -18,19 +30,31 @@ class EcuApiClient:
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
     
     def initialize_method_mapping(self):
-        if None == self.ecuComApi:
-            self.ecuComApi = EcuApiClient()
         self.keywordMapping = self.get_all_api_methods()
-        self.add_main_api_class(self.api.ConfigurationApi)
-        self.add_main_api_class(self.api.PackageApi)
+        self.create_api_classes()
+
+    def create_api_classes(self):
+        if self.ecuTestRunning:
+            self.add_main_api_class(self.api.ConfigurationApi)
+            self.add_main_api_class(self.api.PackageApi)
+            self.add_main_api_class(self.api.GlobalMappingApi)
+            self.add_main_api_class(self.api.ParameterApi)
+            self.add_main_api_class(self.api.ProjectApi)
+            self.add_main_api_class(self.api.ReportApi)
+            self.add_main_api_class(self.api.SignalDescriptionApi)
+            self.add_main_api_class(self.api.TraceFileApi)
+            self.add_main_api_class(self.api.TraceStepTemplateApi)
     
     def get_all_api_methods(self):
         classes = self.get_all_api_classes()
+        self.store_class_methods(classes)
+        return self.keywordMapping
+
+    def store_class_methods(self, classes):
         for c in classes:
             class_methods = dir(c[1])
             class_methods = self.remove_not_needed_methods(class_methods)
             self.update_keyword_dictionary(c[0], class_methods, c[1])
-        return self.keywordMapping
 
     def get_all_api_classes(self):
         return inspect.getmembers(ApiClientModule, inspect.isclass)
@@ -39,6 +63,12 @@ class EcuApiClient:
         for mn in methods:
             mn = class_name + '_' + mn
             self.keywordMapping[mn] = object_id
+
+    def add_new_keywords(self, members, object_name):
+        for m in members:
+            name = object_name + '_' + m[0]
+            debug("Adding keyword with name '%s' for method '%s'", name, m[1])
+            self.keywordMapping[name] = m[1]
 
     def remove_not_needed_methods(self, methods):
         methods = self.remove_undescore_names(methods)
@@ -64,8 +94,10 @@ class EcuApiClient:
     def run_keyword(self, name, args, kwargs):
         method = self.keywordMapping[name]
         debug("calling method '%s' found with name '%s' args '%s' kwargs '%s'", method, name, args, kwargs)
+        
         call_result = self.call_method(method, args, kwargs)
         debug("call_result '%s'", call_result)
+        
         object_methods = self.get_method_names(call_result)
         self.update_method_dictionary(object_methods, call_result.__class__.__name__)
         docs = inspect.getdoc(method)
@@ -102,29 +134,9 @@ class EcuApiClient:
         members = [elem for elem in members if not (elem[0][0] == "_")]
         return members
 
-    def add_new_keywords(self, members, object_name):
-        for m in members:
-            name = object_name + '_' + m[0]
-            debug("Adding keyword with name '%s' for method '%s'", name, m[1])
-            self.keywordMapping[name] = m[1]
-
+    
     def get_keyword_documentation(self, name):
         pass
-        """docs = None
-        if name in self.keywordMapping:
-            obj = self.keywordMapping[name]
-            if callable(obj):
-                try:
-                    obj = obj()
-                except Exception as e:
-                    pass
-            docs = inspect.getdoc(obj)
-            print(docs)
-            methods_name = getattr(ApiClientModule, "PackageApi")
-
-            docs = ApiClientModule.name.__docs__
-            docs = inspect.getdoc(methods_name)
-        return docs"""
 
     def get_keyword_tags(self, name):
         pass
@@ -140,10 +152,12 @@ class EcuApiClient:
         debug(self.keywordMapping.keys())
         return self.keywordMapping.keys()
 
-    def __init__(self):
-        self.ecuComApi = EcuComApi()
-        self.ecuComApi.start_test_environment()
-        self.api = ApiClientClass()
+    def __init__(self, startEcuTest=True):
+        self.ecuTestRunning = startEcuTest
+        if startEcuTest:
+            self.ecuComApi = EcuComApi()
+            self.ecuComApi.start_test_environment()
+            self.api = ApiClientClass()
         self.keywordMapping = dict()
         self.initialize_method_mapping()
     
