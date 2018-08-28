@@ -71,9 +71,6 @@ class EcuApiClient:
     def add_new_keywords(self, members, class_name):
         for m in members:
             self.add_name_object_keywords(class_name, m[0], m[1])
-            """name = object_name + '_' + m[0]
-            debug("Adding keyword with name '%s' for method '%s'", name, m[1])
-            self.keywordMapping[name] = m[1]"""
 
     def remove_not_needed_methods(self, methods):
         methods = self.remove_undescore_names(methods)
@@ -97,19 +94,29 @@ class EcuApiClient:
         return methods
 
     def run_keyword(self, name, args, kwargs):
-        method = self.keywordMapping[name]
-        debug("calling method '%s' found with name '%s' args '%s' kwargs '%s'", method, name, args, kwargs)
+        method = self.get_method(name)
         
         call_result = self.call_method(method, args, kwargs)
         debug("call_result '%s'", call_result)
+
+        self.write_info_docs(method)
+        self.after_run_update_new_objects_keywords(call_result)
         
-        object_methods = self.get_method_names(call_result)
-        self.update_method_dictionary(object_methods, call_result.__class__.__name__)
-        docs = inspect.getdoc(method)
-        if len(docs) > 5:
-            info(docs)
         return call_result
 
+    def get_method(self, name):
+        debug("calling method '%s' found with name '%s' args '%s' kwargs '%s'", method, name, args, kwargs)
+        return self.keywordMapping[name]
+
+    def after_run_update_new_objects_keywords(self, call_result):
+        object_methods = self.get_method_names(call_result)
+        self.update_method_dictionary(object_methods, call_result.__class__.__name__)
+        
+    def write_info_docs(self, method):
+        docs = inspect.getdoc(method)
+        if (not (docs == None)) and len(docs) > 5:  
+            info(docs)
+        
     def call_method(self, method, args, kwargs):
         if len(args) == 0 and len(kwargs) == 0:
             return self.property_or_method_call(method)
@@ -153,16 +160,16 @@ class EcuApiClient:
         return self.keywordMapping
 
     def get_keyword_names(self):
-        self.initialize_method_mapping()
         debug(self.keywordMapping.keys())
         return self.keywordMapping.keys()
 
-    def __init__(self, startEcuTest=True):
+    def __init__(self, startEcuTest=True, initializeKeywordMapping=True):
         self.ecuTestRunning = startEcuTest
         if startEcuTest:
             self.ecuComApi = EcuComApi()
             self.ecuComApi.start_test_environment()
             self.api = ApiClientClass()
         self.keywordMapping = dict()
-        self.initialize_method_mapping()
+        if (initializeKeywordMapping):
+            self.initialize_method_mapping()
     
