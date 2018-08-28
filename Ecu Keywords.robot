@@ -25,11 +25,11 @@ Add Calculation Step With Expectation
 	Package AppendTestStep			${calculation_step}
 
 Create Test Bench Configuration
-	[Arguments]		${tool host}
+	[Arguments]		${tool host}	${tool name}		${tool port}  	${tool access}
 	ConfigurationApi CreateTestBenchConfiguration
 	TestBenchConfiguration CreateToolHost	${tool host}
-	ToolHost Add Tool 	MODELDUMMY
-	Tool Create Port 	MODELACCESS 	Standard
+	ToolHost Add Tool 	${tool name}
+	Tool Create Port 	${tool port} 	${tool access}
 
 Save Test Bench Configuration
 	[Arguments]		${config name}
@@ -51,9 +51,6 @@ Create Model Mapping
 	${Mapping Item}=	MappingApi Create Model Mapping Item		${Model Key}	${Model Path}	${Variable Type}
 	Package GetMapping
 	LocalMapping AddItem	${Mapping Item}
-
-Add Model Mapping Item
-	[Arguments]		
 
 Add Test Step Write
 	[Arguments]		${value}	${Mapping Item}
@@ -82,3 +79,8 @@ Create Test Step Read
 Save Test Configuration
 	[Arguments]					${config_file_path}
 	TestConfiguration Save  	${config_file_path}
+
+Save And Run Package
+	[Arguments]			${package name}
+	Save Package 		${package name}
+	Run Test Package   	${package name}

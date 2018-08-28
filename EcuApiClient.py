@@ -109,9 +109,22 @@ class EcuApiClient:
             self.keywordMapping[name] = m[1]
 
     def get_keyword_documentation(self, name):
-        obj = self.keywordMapping[name]
-        docs = inspect.getdoc(obj)
-        return docs
+        pass
+        """docs = None
+        if name in self.keywordMapping:
+            obj = self.keywordMapping[name]
+            if callable(obj):
+                try:
+                    obj = obj()
+                except Exception as e:
+                    pass
+            docs = inspect.getdoc(obj)
+            print(docs)
+            methods_name = getattr(ApiClientModule, "PackageApi")
+
+            docs = ApiClientModule.name.__docs__
+            docs = inspect.getdoc(methods_name)
+        return docs"""
 
     def get_keyword_tags(self, name):
         pass
