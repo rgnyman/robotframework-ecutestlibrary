@@ -1,6 +1,6 @@
 # Robot Framework ECU-TEST library
 
-This library provides kaywords for creating tests, configurations and test execution for ECU-TEST comercial ECU test tool.
+This library provides keywords for creating tests, configurations and test execution for ECU-TEST ECU test tool.
 
 To use this library you need licenced version of ECU-TEST. More information can be found https://www.tracetronic.com/products/ecu-test/ on the tool. This library has been tested with vesion 7.1 but should work with other versions also.
 
