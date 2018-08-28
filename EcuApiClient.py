@@ -52,36 +52,43 @@ class EcuApiClient:
 
     def store_class_methods(self, classes):
         for c in classes:
-            class_methods = dir(c[1])
-            class_methods = self.remove_not_needed_methods(class_methods)
-            self.update_keyword_dictionary(c[0], class_methods, c[1])
+            self.extract_methods_to_keywords(c)
+
+    def extract_methods_to_keywords(self, c): 
+        class_methods = dir(c[1])
+        cleanable_methods = self.prepare_methods(class_methods, c[0])
+        cleaned_methods = self.clean_methods(cleanable_methods)
+        self.add_new_keywords(cleaned_methods, c[0])
+
+    def prepare_methods(self, all_class_methods, class_name):
+        all_methods = list()
+        for cm in all_class_methods:
+            all_methods.append((cm, class_name))
+        return all_methods
 
     def get_all_api_classes(self):
         return inspect.getmembers(ApiClientModule, inspect.isclass)
-
-    def update_keyword_dictionary(self, class_name, methods, object_id):
-        for mn in methods:
-            self.add_name_object_keywords(class_name, mn, object_id)
         
     def add_name_object_keywords(self, class_name, method_name, object_id):
         key = class_name + '_' + method_name
         debug("Adding keyword with name '%s' for method '%s'", key, object_id)
+        print("Adding keyword with name '%s' for method '%s'" % (key, object_id))
         self.keywordMapping[key] = object_id
 
     def add_new_keywords(self, members, class_name):
         for m in members:
             self.add_name_object_keywords(class_name, m[0], m[1])
 
-    def remove_not_needed_methods(self, methods):
-        methods = self.remove_undescore_names(methods)
-        methods = self.remove_all_capital_names(methods)
-        return methods
+    def clean_methods(self, members):
+        members = self.remove_all_capital_names(members)
+        members = self.remove_undescore_names(members)
+        return members
 
     def remove_all_capital_names(self, methods):
-        return [elem for elem in methods if not (elem.isupper())]
+        return [elem for elem in methods if not (elem[0].isupper())]
 
     def remove_undescore_names(self, methods):
-        return [elem for elem in methods if elem[0] != '_']
+        return [elem for elem in methods if elem[0][0] != '_']
             
     def add_main_api_class(self, api_class):
         members = self.get_method_names(api_class)
@@ -139,12 +146,6 @@ class EcuApiClient:
     def update_method_dictionary(self, members, object_name):
         members = self.clean_methods(members)
         self.add_new_keywords(members, object_name)
-    
-    def clean_methods(self, members):
-        members = [elem for elem in members if not (elem[0].isupper())]
-        members = [elem for elem in members if not (elem[0][0] == "_")]
-        return members
-
     
     def get_keyword_documentation(self, name):
         pass
