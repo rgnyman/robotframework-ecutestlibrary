@@ -15,11 +15,20 @@ Create Test Step Calculation
 	${ts_calculation}=	TestStepApi CreateTsCalculation
 	[return]	${ts_calculation}
 
-Add Calculation Step With Expectation
+Add First Calculation Step With Expectation
 	[Arguments]		${expression}		${expected}
 	${numeric_expetation}=	ExpectationApi CreateNumericExpectation
 	NumericExpectation SetExpression	${expression}
 	${calculation_step}=			Create Test Step Calculation
+	TsCalculation SetExpectation	${numeric_expetation}
+	TsCalculation SetFormula		${expected}
+	Package AppendTestStep			${calculation_step}
+
+Add Calculation Step With Expectation
+	[Arguments]		${expression}		${expected}
+	${numeric_expetation}=	NumericExpectation Clone
+	NumericExpectation SetExpression	${expression}
+	${calculation_step}=			TsCalculation Clone
 	TsCalculation SetExpectation	${numeric_expetation}
 	TsCalculation SetFormula		${expected}
 	Package AppendTestStep			${calculation_step}
@@ -51,28 +60,39 @@ Create Model Mapping
 	${Mapping Item}=	MappingApi Create Model Mapping Item		${Model Key}	${Model Path}	${Variable Type}
 	Package GetMapping
 	LocalMapping AddItem	${Mapping Item}
+	[return]	${Mapping Item}
 
-Add Test Step Write
-	[Arguments]		${value}	${Mapping Item}
-	${ts write}=	Create Test Step Write 	${Mapping Item}
+Add First Test Step Write
+	[Arguments]		${value}	${Mapping Item}  ${model mapping item}
+	${ts write}=	Create Test Step Write 	${model mapping item}
 	TsWrite SetValue	${value}
 	Package AppendTestStep 		${ts write}
 
+Add Test Step Write
+	[Arguments]		${value}	${Mapping Item}  ${model mapping item}
+	${ts write}=	TsWrite Clone
+	TsWrite SetValue	${value}
+	Package AppendTestStep 		${ts write}
+
+Add First Test Step Read
+	[Arguments]		${value}	${Mapping Item} 	${model mapping item}
+	${ts read}=	Create Test Step Read 	${model mapping item}
+	TsRead SetExpectationExpression 	${value}
+	Package AppendTestStep 		${ts read}
+
 Add Test Step Read
-	[Arguments]		${value}	${Mapping Item}
-	${ts read}=	Create Test Step Read 	${Mapping Item}
+	[Arguments]		${value}	${Mapping Item} 	${model mapping item}
+	${ts read}=	TsRead Clone
 	TsRead SetExpectationExpression 	${value}
 	Package AppendTestStep 		${ts read}
 
 Create Test Step Write
-	[Arguments]		${Mapping Item Name}
-	${Mapping Item}=	LocalMapping GetItemByName	${Mapping Item Name}	
+	[Arguments]		${Mapping Item}
 	${ts write}=	TestStepApi CreateTswrite	${Mapping Item}
 	[return]		${ts write}
 
 Create Test Step Read
-	[Arguments]		${Mapping Item Name}
-	${Mapping Item}=	LocalMapping GetItemByName	${Mapping Item Name}	
+	[Arguments]		${Mapping Item }
 	${ts read}=	TestStepApi CreateTsRead	${Mapping Item}
 	[return]		${ts read}
 
