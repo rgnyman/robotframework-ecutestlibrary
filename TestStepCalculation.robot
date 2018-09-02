@@ -4,9 +4,10 @@ Ecu Client Tutorial Peroform Expression and Check Result
 
 Adding Many Expession
 	Create New Package
-	Add Calculation Step With Expectation 	4+2 	6
-	Add Calculation Step With Expectation 	4*2 	8
-	Add Calculation Step With Expectation 	4-2 	2
+	Add First Calculation Step With Expectation 	4+2 	6
+	Add Calculation Step With Expectation 			4*2 	8
+	Add Calculation Step With Expectation 			4-2 	2
+	Add Calculation Step With Expectation 			8/2 	4
 	Save And Run Package 	${TutorialCalculationPackage}
 	
 *** Keywords ***
@@ -16,7 +17,7 @@ Clean After Test
 Execute Expression and Check Result 
 	[Arguments] 	${expression}	${result}
 	Create New Package
-	Add Calculation Step With Expectation 	${expression}		${result}
+	Add First Calculation Step With Expectation 	${expression}		${result}
 	Save And Run Package 	${TutorialCalculationPackage}
 
 *** Settings ***

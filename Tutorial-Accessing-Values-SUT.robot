@@ -14,9 +14,11 @@ Clean After Test
 
 Create Test Package Writing and Reading SUT
 	Create New Package
-	Create Model Mapping   		Plant Model 	simState 	VALUE
-	Add Test Step Write			5   Plant Model/simState
-	Add Test Step Read			5   Plant Model/simState
+	${model mapping item}=	Create Model Mapping   		Plant Model 	simState 	VALUE
+	Add First Test Step Write			5   Plant Model/simState 	${model mapping item}
+	Add First Test Step Read			5   Plant Model/simState	${model mapping item}
+	Add Test Step Write			15   Plant Model/simState	${model mapping item}
+	Add Test Step Read			15   Plant Model/simState	${model mapping item}
 
 Prapare Test And Test Bench Configurations
 	Create Test Configuration
