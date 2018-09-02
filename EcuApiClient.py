@@ -72,9 +72,8 @@ class EcuApiClient:
     def add_name_object_keywords(self, class_name, method_name, object_id):
         key = class_name + '_' + method_name
         debug("Adding keyword with name '%s' for method '%s'", key, object_id)
-        print("Adding keyword with name '%s' for method '%s'" % (key, object_id))
         self.keywordMapping[key] = object_id
-
+        
     def add_new_keywords(self, members, class_name):
         for m in members:
             self.add_name_object_keywords(class_name, m[0], m[1])
